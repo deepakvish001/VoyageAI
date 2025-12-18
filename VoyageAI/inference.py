@@ -10,7 +10,6 @@ print("Model loaded successfully")
 print("Input name:", input_name)
 print("Output name:", output_name)
 
-# Example input: 500 km
 sample_input = np.array([[500]], dtype=np.float32)
 
 prediction = session.run(
@@ -18,7 +17,6 @@ prediction = session.run(
     {input_name: sample_input}
 )
 
-# SAFE extraction (no warning)
 predicted_minutes = prediction[0].item()
 predicted_hours = predicted_minutes / 60
 
