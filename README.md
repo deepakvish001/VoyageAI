@@ -1,23 +1,32 @@
-Problem: Voyage AI – Travel Delay Prediction
+## VoyageAI – Vande Bharat Travel Time Prediction
 
-This project trains a Gradient Boosting (XGBoost) model
-to predict travel delays using synthetic travel data.
+Trains a `scikit-learn` `GradientBoostingRegressor` to predict a Vande
+Bharat Express train's total travel time from its route distance, using
+real route data (`VoyageAI/vande_bharat.csv`) rather than synthetic data.
+The trained model is exported to ONNX so inference doesn't need
+scikit-learn installed.
 
-Input:
-- Distance
-- Transport type
-- Time
-- Day
-- Ticket price
-- Past delay
+**Input:** distance, in kilometres.
 
-Output:
-- Delay in minutes
+**Output:** predicted total travel time, in minutes.
 
-The final trained model is exported in ONNX format
-as required by the hackathon.
+Mean absolute error on the held-out test split is about 51 minutes — the
+dataset is 42 routes after cleaning, so treat this as a baseline rather
+than a tuned model.
 
-Files:
-- train.py → training code
-- inference.py → ONNX inference
-- travel_delay_model.onnx → final model
+### Files
+
+- `VoyageAI/train.py` — parses `vande_bharat.csv`, trains the model, and
+  exports it to `VoyageAI/vande_bharat_travel_time.onnx`.
+- `VoyageAI/inference.py` — loads that ONNX model and runs one sample
+  prediction.
+- `VoyageAI/requirements.txt` — pinned dependencies for both scripts.
+
+### Run it
+
+```
+pip install -r VoyageAI/requirements.txt
+cd VoyageAI
+python train.py       # optional — vande_bharat_travel_time.onnx is already committed
+python inference.py
+```
