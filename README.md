@@ -1,291 +1,133 @@
-# 🚄 VoyageAI
+<div align="center">
 
-<p align="center">
-  <strong>Vande Bharat route travel-time prediction with scikit-learn and portable ONNX inference.</strong>
+<h1>🚄 RailTimeML</h1>
+
+<p><strong>A reproducible machine-learning baseline for Vande Bharat journey-time prediction.</strong></p>
+
+![Python](https://img.shields.io/badge/Python-20232A?style=for-the-badge) ![scikit-learn](https://img.shields.io/badge/scikit-learn-20232A?style=for-the-badge) ![pandas](https://img.shields.io/badge/pandas-20232A?style=for-the-badge) ![ONNX Runtime](https://img.shields.io/badge/ONNX_Runtime-20232A?style=for-the-badge)
+
+<p>
+  <a href="#features">Features</a> •
+  <a href="#technology-stack">Technology</a> •
+  <a href="#local-setup">Setup</a> •
+  <a href="#contributing">Contributing</a>
 </p>
 
-<p align="center">
-  Python • pandas • scikit-learn • Gradient Boosting • ONNX Runtime
-</p>
+</div>
 
 ---
 
 ## Overview
 
-VoyageAI trains a machine-learning baseline that predicts the total journey time of a Vande Bharat Express route from its distance. The project cleans a small route dataset, trains a Gradient Boosting regressor, evaluates it with Mean Absolute Error, exports the model to ONNX, and provides a lightweight inference command.
+RailTimeML trains a compact machine-learning baseline that estimates Vande Bharat journey duration from route distance. It cleans the bundled CSV data, trains a Gradient Boosting regressor, reports Mean Absolute Error, exports the model to ONNX, and supports portable command-line inference.
 
-The current model uses one feature—route distance—so its output should be treated as a baseline rather than a timetable or operational forecast.
+The current dataset is small and the model uses a single feature. Predictions are educational baselines—not official schedules, operational forecasts, or passenger guidance.
 
-## Current Pipeline
+## Features
 
-\`\`\`text
-vande_bharat.csv
-       │
-       ▼
-Distance and travel-time parsing
-       │
-       ▼
-Missing-row removal
-       │
-       ▼
-Train/test split
-       │
-       ▼
-GradientBoostingRegressor
-       │
-       ├── Mean Absolute Error evaluation
-       └── ONNX export
-                 │
-                 ▼
-        onnxruntime inference
-\`\`\`
+- Distance and travel-time parsing from route data
+- Deterministic train/test split
+- Gradient Boosting regression baseline
+- Mean Absolute Error evaluation
+- ONNX model export
+- ONNX Runtime inference command
+- Documentation for data, modeling, evaluation, security, API, and MLOps evolution
 
-## Technology Stack
+## Technology stack
 
 | Area | Technology |
-|---|---|
+| --- | --- |
 | Language | Python |
-| Data processing | pandas and NumPy |
+| Data | pandas and NumPy |
 | Model | scikit-learn GradientBoostingRegressor |
-| Evaluation | Mean Absolute Error |
-| Model conversion | skl2onnx |
-| Portable inference | ONNX Runtime |
-| Dataset | Vande Bharat route data in CSV |
+| Export | skl2onnx |
+| Inference | ONNX Runtime |
+| Source data | Vande Bharat route CSV |
 
-## Project Structure
+## Pipeline
 
-\`\`\`text
-VoyageAI/
+```mermaid
+flowchart LR
+    CSV["Route CSV"] --> Parse["Parse and clean"]
+    Parse --> Split["Train/test split"]
+    Split --> Model["Gradient Boosting"]
+    Model --> Eval["MAE report"]
+    Model --> ONNX["ONNX artifact"]
+    ONNX --> Infer["Portable inference"]
+```
+
+## Repository structure
+
+```text
+RailTimeML/
 ├── README.md
-├── .gitignore
-└── VoyageAI/
+├── docs/
+└── VoyageAI/                 # Current implementation directory
     ├── train.py
     ├── inference.py
     ├── requirements.txt
     ├── vande_bharat.csv
-    ├── vande_bharat_travel_time.onnx
-    └── README.md
-\`\`\`
+    └── vande_bharat_travel_time.onnx
+```
 
-## Dataset
-
-The training script reads:
-
-- Distance
-- Travel Time
-
-It converts distance values containing kilometres into floating-point values and travel-time strings containing hours and minutes into total minutes. Rows that cannot be parsed are removed.
-
-The dataset contains approximately 42 usable routes after cleaning. This is too small for strong generalisation claims.
-
-## Model
-
-The baseline uses:
-
-\`\`\`text
-GradientBoostingRegressor
-n_estimators = 100
-learning_rate = 0.1
-max_depth = 3
-random_state = 42
-\`\`\`
-
-The data is split into training and test sets using a fixed random seed. Mean Absolute Error is reported in minutes.
-
-## Complete Local Setup
-
-### 1. Prerequisites
-
-Install:
+## Prerequisites
 
 - Git
 - Python 3.11 or newer
-- pip
-- A virtual-environment tool
+- pip and `venv`
 
-Confirm your tools:
+## Local setup
 
-\`\`\`bash
-python --version
-pip --version
-git --version
-\`\`\`
-
-### 2. Clone the repository
-
-\`\`\`bash
-git clone https://github.com/deepakvish001/VoyageAI.git
-cd VoyageAI
-\`\`\`
-
-### 3. Create a virtual environment
-
-Linux or macOS:
-
-\`\`\`bash
+```bash
+git clone https://github.com/deepakvish001/VoyageAI.git RailTimeML
+cd RailTimeML
 python -m venv .venv
+```
+
+Activate the environment:
+
+```bash
+# Linux/macOS
 source .venv/bin/activate
-\`\`\`
 
-Windows PowerShell:
-
-\`\`\`powershell
-python -m venv .venv
+# Windows PowerShell
 .venv\Scripts\Activate.ps1
-\`\`\`
+```
 
-### 4. Install dependencies
+Install dependencies:
 
-\`\`\`bash
-pip install --upgrade pip
+```bash
+python -m pip install --upgrade pip
 pip install -r VoyageAI/requirements.txt
-\`\`\`
+```
 
-### 5. Train and export the model
+## Train and export
 
-The scripts currently resolve data and model paths relative to the working directory. Enter the inner project directory:
-
-\`\`\`bash
+```bash
 cd VoyageAI
 python train.py
-\`\`\`
+```
 
-Successful training prints:
+Training prints data-cleaning information, the evaluation score, and ONNX export confirmation.
 
-- parsed columns
-- number of cleaned rows
-- model-training completion
-- Mean Absolute Error
-- ONNX export confirmation
+## Run inference
 
-The exported file is:
+From the implementation directory:
 
-\`\`\`text
-vande_bharat_travel_time.onnx
-\`\`\`
-
-### 6. Run inference
-
-From the inner VoyageAI directory:
-
-\`\`\`bash
+```bash
 python inference.py 500
-\`\`\`
+```
 
-The positional argument is route distance in kilometres. If omitted, the default is 500 km:
+The positional value is route distance in kilometres. Validate model inputs and keep production contracts consistent with the ONNX input type and shape.
 
-\`\`\`bash
-python inference.py
-\`\`\`
+## Reproducibility and limitations
 
-The command prints predicted travel time in minutes and hours.
-
-## Reproducible Workflow
-
-From the repository root:
-
-\`\`\`bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r VoyageAI/requirements.txt
-cd VoyageAI
-python train.py
-python inference.py 500
-\`\`\`
-
-## Current Limitations
-
-- Only route distance is used as a feature.
-- The cleaned dataset is small.
-- A single train/test split gives an unstable estimate.
-- No cross-validation or uncertainty range is reported.
-- Station count, stops, route type, region and timetable features are absent.
-- Data lineage and update dates are not recorded.
-- Parsing functions are embedded in the training script.
-- File paths depend on the working directory.
-- Hyperparameters are hard-coded.
-- Model artifacts are committed without a metadata manifest.
-- ONNX and scikit-learn prediction parity is not tested.
-- Automated tests and continuous integration are absent.
-- The model should not be used for passenger guarantees or railway operations.
-
-## Validation Priorities
-
-A stronger evaluation should include:
-
-- repeated or cross-validated evaluation
-- comparison with simple baselines
-- Mean Absolute Error, Root Mean Squared Error and median error
-- error by distance range
-- residual inspection
-- prediction sanity checks
-- model-versus-ONNX parity
-- reproducible data snapshots
-- confidence or prediction intervals
-- documented limitations
-
-## Security and Data Guidance
-
-- Treat external CSV content as untrusted input.
-- Validate file size, columns, encodings and numeric ranges.
-- Do not load untrusted pickle or joblib files.
-- Pin and review dependencies.
-- Keep API credentials and private datasets out of source control.
-- Record model provenance and checksums.
-- Avoid logging personal passenger information.
-- Apply request limits if an inference API is introduced.
-
-## Modernisation Roadmap
-
-- Extract reusable parsing and feature modules
-- Add structured configuration
-- Add command-line options for paths and hyperparameters
-- Introduce data validation
-- Add baseline and model comparison
-- Add cross-validation and experiment tracking
-- Add model metadata and artifact checksums
-- Verify ONNX prediction parity
-- Add unit and integration tests
-- Add linting, formatting and type checking
-- Add CI
-- Build a FastAPI inference service
-- Add Docker support
-- Add an interactive route dashboard
-- Add drift and performance monitoring
-- Expand route and timetable features
-- Document a retraining and release process
+- Preserve the fixed random seed when comparing changes.
+- Record dataset, dependency, and artifact versions.
+- Do not interpret low holdout error as broad generalisation from a small dataset.
+- Add schedule, stops, region, and operational features before real-world claims.
+- Validate exported ONNX predictions against scikit-learn output.
 
 ## Contributing
 
-Keep every pull request focused and independently verifiable.
-
-\`\`\`bash
-git checkout main
-git pull --ff-only
-git checkout -b feat/short-change-name
-python -m venv .venv
-source .venv/bin/activate
-pip install -r VoyageAI/requirements.txt
-git add .
-git commit -m "feat: describe the change"
-git push -u origin feat/short-change-name
-\`\`\`
-
-For model changes, include:
-
-- data and feature changes
-- baseline comparison
-- evaluation metrics
-- reproducibility details
-- ONNX export impact
-- limitations and rollback notes
-
-## License
-
-Add an explicit licence file before redistributing the dataset, model or source outside the intended project context.
-
----
-
-<p align="center">
-  A transparent baseline for exploring route travel-time prediction and portable ML inference.
-</p>
+Include before/after metrics for model changes, document data assumptions, and add tests for parsers, feature contracts, and inference. Never commit private passenger, operational, or credential data.
